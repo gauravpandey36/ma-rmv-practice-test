@@ -302,7 +302,7 @@ const ALL_Q = [
 {"n": 77, "q": "Unless posted otherwise, what would be considered a reasonable and proper speed when driving in a thickly settled or business district?", "a": "30 mph.", "b": "40 mph.", "c": "50 mph", "d": "55 mph.", "ans": "A"},
 {"n": 78, "q": "What must you do if you see any pedestrians entering or using a crosswalk in your path of travel?", "a": "Nothing if you have the right-of-way.", "b": "You must yield to the pedestrians.", "c": "Nothing if others are not yielding the right of way to the pedestrians.", "d": "You must yield if it is convenient.", "ans": "B"},
 {"n": 79, "q": "When may you let your vehicle block a crosswalk?", "a": "When the traffic flow traffic is heavy.", "b": "When you are stopped at a red light.", "c": "When the light is green and traffic is not moving.", "d": "Never.", "ans": "D"},
-{"n": 80, "q": "When you see a sign that uses a red circle with a diagonal slash what does that circle and slash mean?", "a": \"\"Okay to.\"\", "b": \"\"Sometimes permissible.\"\", "c": "These signs do not pertain to motorists.", "d": "Access or movement is prohibited, think \"No.\"", "ans": "D"},
+{"n": 80, "q": "When you see a sign that uses a red circle with a diagonal slash what does that circle and slash mean?", "a": "\"Okay to.\"", "b": "\"Sometimes permissible.\"", "c": "These signs do not pertain to motorists.", "d": "Access or movement is prohibited, think \"No.\"", "ans": "D"},
 {"n": 81, "q": "The shape of a \"railroad crossing\" sign is?", "a": "Diamond.", "b": "Square.", "c": "Round.", "d": "Triangle.", "ans": "C"},
 {"n": 82, "q": "What must you do if a flag person or police officer is directing traffic around a work zone?", "a": "You must obey the flagger's or officer's signals.", "b": "You may obey the flagger's or officer's signals if it doesn't conflict with other rules of the road.", "c": "You may obey the flagger's or officer's signals if it is convenient.", "d": "You must obey the flagger's or officer's signals only if he or she is with the State Police.", "ans": "A"},
 {"n": 83, "q": "If the lights at a railroad crossing are flashing how far before the light post or gate must you stop?", "a": "200 feet.", "b": "15 feet.", "c": "3 feet.", "d": "You do not need to stop.", "ans": "B"},
@@ -415,7 +415,7 @@ const ALL_Q = [
 {"n": 190, "q": "When is it illegal to operate a motor vehicle while impaired?", "a": "Only when alcohol is involved.", "b": "Only when illegal drugs are involved.", "c": "It is illegal to operate a motor vehicle while impaired by any substance.", "d": "Only when the driver is under 21 years of age.", "ans": "C"},
 {"n": 191, "q": "Can the use of illegal \"hard\" drugs like heroin or cocaine affect your driving?", "a": "No.", "b": "There are side effects, but none which could impair your driving.", "c": "We don't know enough about their impact.", "d": "They can make you unaware and indifferent to your surroundings.", "ans": "D"},
 {"n": 192, "q": "Can use of prescription sedatives and tranquilizers have a negative impact on your driving abilities?", "a": "Prescription can make you drowsy.", "b": "Prescription medication use has no negative impact on your driving abilities.", "c": "There are side effects of prescription medication use, but none that impact driving ability.", "d": "We just don't know enough about the side effects of prescription medication use.", "ans": "A"},
-{"n": 193, "q": "Can use of most medicines taken for colds, hay fever or headaches have a negative impact on your driving abilities?", "a": \"\"Everyday medicine\" use has no negative impact on your driving abilities.\", "b": \"\"Everyday medicine\" can cause drowsiness.\", "c": "There are side effects of \"everyday medicine\" use, but none that impact driving ability.", "d": "We just don't know enough about the side effects of \"everyday medicine\" use.", "ans": "B"},
+{"n": 193, "q": "Can use of most medicines taken for colds, hay fever or headaches have a negative impact on your driving abilities?", "a": "Everyday medicine use has no negative impact on your driving abilities.", "b": "Everyday medicine can cause drowsiness.", "c": "There are side effects of everyday medicine use, but none that impact driving ability.", "d": "We just do not know enough about the side effects of everyday medicine use.", "ans": "B"},
 {"n": 194, "q": "Can use of stimulants such as pep pills, speed, cocaine and diet pills have a negative impact on your driving abilities?", "a": "Stimulant use has no negative impact on your driving abilities.", "b": "There are side effects of stimulant use, but none that impact driving ability.", "c": "Stimulants can inevitably cause fatigue, nervousness, dizziness and a lack of concentration and can also affect vision.", "d": "We just don't know enough about the side effects of stimulant use.", "ans": "C"},
 {"n": 195, "q": "Can use of inhalants such as solvents or glue vapors have a negative impact on your driving abilities?", "a": "Inhalant use has no negative impact on your driving abilities.", "b": "There are side effects of inhalant use, but none that impact driving ability.", "c": "We just don't know enough about the side effects of inhalant use.", "d": "Inhalants are not only a serious health hazard but can make you unable to operate a motor vehicle properly.", "ans": "D"},
 {"n": 196, "q": "The best way to determine side effects from prescription or over the counter drugs is to:", "a": "There should be no side effects.", "b": "Ask friends who use that medication.", "c": "Take the medication and experiment with driving to see the effect.", "d": "Read all labels and ask your doctor or pharmacist how they can effect you.", "ans": "D"},
@@ -423,3 +423,182 @@ const ALL_Q = [
 {"n": 198, "q": "Under what circumstances will your driver's license be suspended if you are convicted of a drug offense?", "a": "If you are convicted of a drug offense in Massachusetts only.", "b": "If you are convicted of any drug offense, whether it is in Massachusetts or another state.", "c": "If you are convicted of a drug offense in another state only.", "d": "Your license won't be suspended if you are convicted of a drug offense.", "ans": "B"},
 {"n": 199, "q": "Under what circumstances will your driver's license be suspended if you are convicted of a drug offense?", "a": "Only if a motor vehicle was involved in the offense.", "b": "Even if no motor vehicle was involved in the offense.", "c": "Only if you are under 21 years of age.", "d": "Your license won't be suspended if you are convicted of a drug offense.", "ans": "B"},
 {"n": 200, "q": "Massachusetts law requires you to lose your driving privileges for how long if you are convicted of a drug offense?", "a": "30 days to 90 days, depending on the conviction.", "b": "90 days to 180 days, depending on the conviction.", "c": "1 to 5 years, depending on the conviction.", "d": "A loss of license is not required.", "ans": "C"}
+];
+
+let mode="practice", qCount=50, pool=[], ci=0, correct=0, wrong=0, answers={}, answered={};
+let bookmarks=JSON.parse(localStorage.getItem("rmv_bm")||"[]");
+let history=JSON.parse(localStorage.getItem("rmv_hist")||"{}");
+
+function show(id){ document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active")); document.getElementById(id).classList.add("active"); window.scrollTo(0,0); }
+
+function selectMode(el){ document.querySelectorAll(".mode-btn").forEach(b=>b.classList.remove("active")); el.classList.add("active"); mode=el.dataset.mode; }
+function selectCount(el){ document.querySelectorAll(".count-btn").forEach(b=>b.classList.remove("active")); el.classList.add("active"); qCount=parseInt(el.dataset.count)||200; }
+
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+function startQuiz(){
+  let src=[...ALL_Q];
+  if(mode==="missed"){ src=src.filter(q=>history[q.n]==="wrong"); if(!src.length){ alert("No missed questions yet! Try Practice mode first."); return; } }
+  if(mode==="bookmarked"){ src=src.filter(q=>bookmarks.includes(q.n)); if(!src.length){ alert("No bookmarked questions yet! Star questions during practice."); return; } }
+  pool=shuffle(src).slice(0,Math.min(qCount,src.length));
+  ci=0; correct=0; wrong=0; answers={}; answered={};
+  show("quiz"); renderQ();
+}
+
+function renderQ(){
+  let q=pool[ci];
+  document.getElementById("qNum").textContent=`Question ${ci+1} of ${pool.length}`;
+  document.getElementById("qText").textContent=q.q;
+  document.getElementById("sQ").textContent=`${ci+1}/${pool.length}`;
+  document.getElementById("sC").textContent=correct;
+  document.getElementById("sW").textContent=wrong;
+  let tot=correct+wrong; document.getElementById("sPct").textContent=tot?Math.round(correct/tot*100)+"%":"0%";
+  document.getElementById("pBar").style.width=((ci+1)/pool.length*100)+"%";
+  
+  let bmk=document.getElementById("bmk");
+  bmk.innerHTML=bookmarks.includes(q.n)?"&#9733;":"&#9734;";
+  bmk.classList.toggle("active",bookmarks.includes(q.n));
+
+  let opts=document.getElementById("options");
+  let letters=["A","B","C","D"];
+  let choices=[q.a,q.b,q.c,q.d].filter(x=>x);
+  opts.innerHTML=choices.map((c,i)=>`<div class="option ${getOptClass(letters[i])}" data-letter="${letters[i]}" onclick="pick('${letters[i]}')"><div class="opt-letter">${letters[i]}</div><div class="opt-text">${c}</div></div>`).join("");
+  
+  let expl=document.getElementById("expl");
+  if(answered[ci]){
+    let isRight=answers[ci]===q.ans;
+    expl.style.display="block";
+    expl.className="explanation"+(isRight?"":" wrong-expl");
+    document.getElementById("explText").innerHTML=isRight
+      ? `<span class="icon">&#9989;</span> Correct! The answer is <strong>${q.ans}</strong>.`
+      : `<span class="icon">&#10060;</span> Wrong. The correct answer is <strong>${q.ans}</strong>.`;
+  } else { expl.style.display="none"; }
+  
+  document.getElementById("prevBtn").style.visibility=ci>0?"visible":"hidden";
+  document.getElementById("nextBtn").textContent=ci===pool.length-1?(mode==="test"?"Finish":"Finish"):"Next →";
+}
+
+function getOptClass(letter){
+  if(!answered[ci]) return answers[ci]===letter?"selected":"";
+  let q=pool[ci];
+  if(mode==="test" && !answered[ci]) return answers[ci]===letter?"selected":"";
+  if(letter===q.ans) return answered[ci]?"correct":"";
+  if(letter===answers[ci]) return "wrong";
+  return "";
+}
+
+function pick(letter){
+  let q=pool[ci];
+  if(answered[ci]) return;
+  answers[ci]=letter;
+  if(mode==="practice"){ revealAnswer(); }
+  else { document.querySelectorAll(".option").forEach(o=>{ o.classList.remove("selected"); if(o.dataset.letter===letter) o.classList.add("selected"); }); }
+}
+
+function revealAnswer(){
+  if(answered[ci]) return;
+  let q=pool[ci];
+  if(!answers[ci]) return;
+  answered[ci]=true;
+  let isRight=answers[ci]===q.ans;
+  if(isRight){ correct++; history[q.n]="correct"; }
+  else{ wrong++; history[q.n]="wrong"; }
+  localStorage.setItem("rmv_hist",JSON.stringify(history));
+  renderQ();
+}
+
+function nextQ(){
+  if(mode==="test" && !answered[ci]){
+    if(!answers[ci]){ alert("Please select an answer."); return; }
+    answered[ci]=true;
+    let q=pool[ci];
+    let isRight=answers[ci]===q.ans;
+    if(isRight){ correct++; history[q.n]="correct"; } else { wrong++; history[q.n]="wrong"; }
+    localStorage.setItem("rmv_hist",JSON.stringify(history));
+  }
+  if(mode==="practice" && !answered[ci]){
+    if(answers[ci]) revealAnswer();
+    return;
+  }
+  if(ci<pool.length-1){ ci++; renderQ(); window.scrollTo(0,0); }
+  else { showResults(); }
+}
+
+function prevQ(){ if(ci>0){ ci--; renderQ(); window.scrollTo(0,0); } }
+
+function toggleBookmark(){
+  let q=pool[ci];
+  let idx=bookmarks.indexOf(q.n);
+  if(idx>=0) bookmarks.splice(idx,1); else bookmarks.push(q.n);
+  localStorage.setItem("rmv_bm",JSON.stringify(bookmarks));
+  renderQ();
+}
+
+function showResults(){
+  show("results");
+  let pct=Math.round(correct/(correct+wrong)*100)||0;
+  let pass=pct>=72;
+  let circle=document.getElementById("resCircle");
+  circle.className="result-circle "+(pass?"pass":"fail");
+  document.getElementById("resPct").textContent=pct+"%";
+  document.getElementById("resLabel").textContent=pass?"PASSED":"NEEDS WORK";
+  document.getElementById("resDetails").innerHTML=`
+    <div class="result-row"><span>Total Questions</span><strong>${pool.length}</strong></div>
+    <div class="result-row"><span>Correct</span><strong style="color:#22c55e">${correct}</strong></div>
+    <div class="result-row"><span>Wrong</span><strong style="color:#ef4444">${wrong}</strong></div>
+    <div class="result-row"><span>Passing Score</span><strong>72%</strong></div>
+    <div class="result-row"><span>Your Score</span><strong style="color:${pass?'#22c55e':'#ef4444'}">${pct}%</strong></div>
+  `;
+}
+
+function showReview(){ show("review"); filterReview("all",document.querySelector("#reviewFilter .count-btn")); }
+
+function filterReview(type, el){
+  document.querySelectorAll("#reviewFilter .count-btn").forEach(b=>b.classList.remove("active"));
+  if(el) el.classList.add("active");
+  let list=document.getElementById("reviewList");
+  let html="";
+  pool.forEach((q,i)=>{
+    let isRight=answers[i]===q.ans;
+    if(type==="wrong" && isRight) return;
+    if(type==="correct" && !isRight) return;
+    let letters={"A":q.a,"B":q.b,"C":q.c,"D":q.d};
+    html+=`<div class="review-item ${isRight?'was-correct':''}">
+      <div style="font-size:12px;color:#64748b;margin-bottom:4px">Q${q.n} &bull; ${isRight?'<span style="color:#22c55e">Correct</span>':'<span style="color:#ef4444">Wrong</span>'}</div>
+      <div style="font-size:14px;color:#e2e8f0;margin-bottom:8px">${q.q}</div>
+      ${!isRight?`<div style="font-size:13px;color:#fca5a5">Your answer: ${answers[i]}. ${letters[answers[i]]||''}</div>`:''}
+      <div style="font-size:13px;color:#86efac">Correct: ${q.ans}. ${letters[q.ans]||''}</div>
+    </div>`;
+  });
+  list.innerHTML=html||'<p style="color:#64748b;text-align:center;padding:20px">No questions to show.</p>';
+}
+
+function goHome(){ show("home"); updateHomeStats(); }
+
+function updateHomeStats(){
+  let total=Object.keys(history).length;
+  if(!total){ document.getElementById("homeStats").style.display="none"; return; }
+  document.getElementById("homeStats").style.display="block";
+  let c=Object.values(history).filter(v=>v==="correct").length;
+  let w=Object.values(history).filter(v=>v==="wrong").length;
+  document.getElementById("homeStatsContent").innerHTML=`
+    <div class="result-row"><span>Questions Attempted</span><strong>${total} / 200</strong></div>
+    <div class="result-row"><span>Mastered</span><strong style="color:#22c55e">${c}</strong></div>
+    <div class="result-row"><span>Need Review</span><strong style="color:#ef4444">${w}</strong></div>
+    <div class="result-row"><span>Bookmarked</span><strong style="color:#f59e0b">${bookmarks.length}</strong></div>
+  `;
+}
+
+function resetProgress(){
+  if(confirm("Reset all progress and bookmarks?")){
+    history={}; bookmarks=[];
+    localStorage.removeItem("rmv_hist");
+    localStorage.removeItem("rmv_bm");
+    updateHomeStats();
+  }
+}
+
+updateHomeStats();
+</script>
+</body>
+</html>
