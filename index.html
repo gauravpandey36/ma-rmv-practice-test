@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>MA RMV Practice Test</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; background:#0f172a; color:#e2e8f0; min-height:100vh; }
+
+/* Header */
+.header { background:linear-gradient(135deg,#1e3a5f,#2563eb); padding:16px 20px; text-align:center; position:sticky; top:0; z-index:10; box-shadow:0 2px 12px rgba(0,0,0,.3); }
+.header h1 { font-size:20px; font-weight:700; color:#fff; }
+.header p { font-size:13px; color:#93c5fd; margin-top:4px; }
+
+/* Screens */
+.screen { display:none; padding:20px; max-width:600px; margin:0 auto; }
+.screen.active { display:block; }
+
+/* Menu */
+.menu-card { background:#1e293b; border-radius:16px; padding:24px; margin-bottom:16px; border:1px solid #334155; }
+.menu-card h2 { font-size:18px; color:#60a5fa; margin-bottom:8px; }
+.menu-card p { font-size:14px; color:#94a3b8; line-height:1.5; }
+
+.btn { display:block; width:100%; padding:16px; border-radius:12px; border:none; font-size:16px; font-weight:600; cursor:pointer; margin-bottom:12px; transition:transform .1s,box-shadow .15s; text-align:center; }
+.btn:active { transform:scale(.97); }
+.btn-primary { background:linear-gradient(135deg,#2563eb,#3b82f6); color:#fff; box-shadow:0 4px 14px rgba(37,99,235,.4); }
+.btn-secondary { background:#1e293b; color:#60a5fa; border:2px solid #334155; }
+.btn-danger { background:linear-gradient(135deg,#dc2626,#ef4444); color:#fff; }
+
+/* Stats bar */
+.stats { display:flex; justify-content:space-between; background:#1e293b; border-radius:12px; padding:12px 16px; margin-bottom:16px; border:1px solid #334155; }
+.stat { text-align:center; }
+.stat-val { font-size:20px; font-weight:700; color:#60a5fa; }
+.stat-label { font-size:11px; color:#64748b; text-transform:uppercase; letter-spacing:.5px; }
+
+/* Progress bar */
+.progress-wrap { background:#1e293b; border-radius:8px; height:8px; margin-bottom:20px; overflow:hidden; }
+.progress-bar { height:100%; border-radius:8px; background:linear-gradient(90deg,#2563eb,#60a5fa); transition:width .3s; }
+
+/* Question card */
+.q-card { background:#1e293b; border-radius:16px; padding:20px; margin-bottom:16px; border:1px solid #334155; }
+.q-num { font-size:12px; color:#60a5fa; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+.q-text { font-size:16px; line-height:1.6; color:#f1f5f9; }
+
+/* Answer options */
+.option { display:flex; align-items:flex-start; gap:12px; background:#0f172a; border:2px solid #334155; border-radius:12px; padding:14px 16px; margin-bottom:10px; cursor:pointer; transition:border-color .15s,background .15s; -webkit-tap-highlight-color:transparent; }
+.option:active { background:#1e293b; }
+.option.selected { border-color:#2563eb; background:#172554; }
+.option.correct { border-color:#16a34a; background:#052e16; }
+.option.wrong { border-color:#dc2626; background:#450a0a; }
+.option.show-correct { border-color:#16a34a; background:#052e16; }
+.opt-letter { min-width:32px; height:32px; border-radius:8px; background:#334155; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; color:#94a3b8; flex-shrink:0; }
+.option.selected .opt-letter { background:#2563eb; color:#fff; }
+.option.correct .opt-letter { background:#16a34a; color:#fff; }
+.option.wrong .opt-letter { background:#dc2626; color:#fff; }
+.option.show-correct .opt-letter { background:#16a34a; color:#fff; }
+.opt-text { font-size:15px; line-height:1.5; color:#cbd5e1; padding-top:4px; }
+
+/* Explanation */
+.explanation { background:#052e16; border:1px solid #16a34a; border-radius:12px; padding:14px 16px; margin-top:12px; display:none; }
+.explanation.wrong-expl { background:#450a0a; border-color:#dc2626; }
+.explanation p { font-size:14px; line-height:1.5; }
+.explanation .icon { font-size:20px; margin-bottom:4px; }
+
+/* Nav buttons */
+.nav-row { display:flex; gap:12px; margin-top:8px; }
+.nav-row .btn { flex:1; padding:14px; font-size:15px; }
+
+/* Results */
+.result-circle { width:160px; height:160px; border-radius:50%; margin:20px auto; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.result-circle.pass { background:linear-gradient(135deg,#052e16,#16a34a); border:4px solid #22c55e; }
+.result-circle.fail { background:linear-gradient(135deg,#450a0a,#dc2626); border:4px solid #ef4444; }
+.result-pct { font-size:42px; font-weight:800; color:#fff; }
+.result-label { font-size:13px; color:#bbf7d0; }
+.fail .result-label { color:#fca5a5; }
+
+.result-details { background:#1e293b; border-radius:16px; padding:20px; margin:20px 0; border:1px solid #334155; }
+.result-row { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #334155; }
+.result-row:last-child { border:none; }
+
+/* Review list */
+.review-item { background:#1e293b; border-radius:12px; padding:14px 16px; margin-bottom:10px; border-left:4px solid #dc2626; cursor:pointer; }
+.review-item.was-correct { border-left-color:#16a34a; }
+
+/* Mode selector */
+.mode-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:16px 0; }
+.mode-btn { background:#1e293b; border:2px solid #334155; border-radius:12px; padding:16px 12px; text-align:center; cursor:pointer; transition:border-color .15s; }
+.mode-btn.active { border-color:#2563eb; background:#172554; }
+.mode-btn .mode-icon { font-size:28px; margin-bottom:6px; }
+.mode-btn .mode-title { font-size:14px; font-weight:600; color:#e2e8f0; }
+.mode-btn .mode-desc { font-size:11px; color:#64748b; margin-top:4px; }
+
+/* Count selector */
+.count-row { display:flex; gap:8px; margin:12px 0; flex-wrap:wrap; }
+.count-btn { flex:1; min-width:60px; padding:10px; border-radius:10px; border:2px solid #334155; background:#1e293b; color:#94a3b8; font-size:14px; font-weight:600; text-align:center; cursor:pointer; }
+.count-btn.active { border-color:#2563eb; color:#60a5fa; background:#172554; }
+
+/* Bookmark star */
+.bookmark { position:absolute; top:16px; right:16px; font-size:24px; cursor:pointer; opacity:.4; transition:opacity .15s; }
+.bookmark.active { opacity:1; }
+.q-card { position:relative; }
+
+/* Scroll fix for mobile */
+html { scroll-behavior:smooth; }
+</style>
+</head>
+<body>
+
+<div class="header">
+<h1>MA RMV Practice Test</h1>
+<p>200 Questions &bull; Class D License</p>
+</div>
+
+<!-- HOME SCREEN -->
+<div id="home" class="screen active">
+<div class="menu-card">
+<h2>Welcome, Gourav!</h2>
+<p>Practice all 200 official RMV questions for your Massachusetts Class D driver's license written test. Track your progress and focus on what you need to learn.</p>
+</div>
+
+<div class="menu-card">
+<h2>Quiz Mode</h2>
+<div class="mode-grid">
+<div class="mode-btn active" data-mode="practice" onclick="selectMode(this)">
+<div class="mode-icon">&#128218;</div>
+<div class="mode-title">Practice</div>
+<div class="mode-desc">See answers instantly</div>
+</div>
+<div class="mode-btn" data-mode="test" onclick="selectMode(this)">
+<div class="mode-icon">&#9201;</div>
+<div class="mode-title">Test</div>
+<div class="mode-desc">Score at the end</div>
+</div>
+<div class="mode-btn" data-mode="missed" onclick="selectMode(this)">
+<div class="mode-icon">&#10060;</div>
+<div class="mode-title">Missed Only</div>
+<div class="mode-desc">Review wrong answers</div>
+</div>
+<div class="mode-btn" data-mode="bookmarked" onclick="selectMode(this)">
+<div class="mode-icon">&#11088;</div>
+<div class="mode-title">Bookmarked</div>
+<div class="mode-desc">Your saved questions</div>
+</div>
+</div>
+</div>
+
+<div class="menu-card">
+<h2>Number of Questions</h2>
+<div class="count-row">
+<div class="count-btn" data-count="10" onclick="selectCount(this)">10</div>
+<div class="count-btn" data-count="25" onclick="selectCount(this)">25</div>
+<div class="count-btn active" data-count="50" onclick="selectCount(this)">50</div>
+<div class="count-btn" data-count="100" onclick="selectCount(this)">100</div>
+<div class="count-btn" data-count="200" onclick="selectCount(this)">All</div>
+</div>
+</div>
+
+<button class="btn btn-primary" onclick="startQuiz()">Start Quiz</button>
+
+<div id="homeStats" class="menu-card" style="display:none">
+<h2>Your Progress</h2>
+<div id="homeStatsContent"></div>
+</div>
+
+<button class="btn btn-secondary" onclick="resetProgress()">Reset All Progress</button>
+</div>
+
+<!-- QUIZ SCREEN -->
+<div id="quiz" class="screen">
+<div class="stats">
+<div class="stat"><div class="stat-val" id="sQ">1/50</div><div class="stat-label">Question</div></div>
+<div class="stat"><div class="stat-val" id="sC">0</div><div class="stat-label">Correct</div></div>
+<div class="stat"><div class="stat-val" id="sW">0</div><div class="stat-label">Wrong</div></div>
+<div class="stat"><div class="stat-val" id="sPct">0%</div><div class="stat-label">Score</div></div>
+</div>
+<div class="progress-wrap"><div class="progress-bar" id="pBar"></div></div>
+
+<div class="q-card" id="qCard">
+<span class="bookmark" id="bmk" onclick="toggleBookmark()">&#9734;</span>
+<div class="q-num" id="qNum">Question 1 of 50</div>
+<div class="q-text" id="qText"></div>
+</div>
+
+<div id="options"></div>
+
+<div class="explanation" id="expl">
+<p id="explText"></p>
+</div>
+
+<div class="nav-row">
+<button class="btn btn-secondary" id="prevBtn" onclick="prevQ()">&#8592; Back</button>
+<button class="btn btn-primary" id="nextBtn" onclick="nextQ()">Next &#8594;</button>
+</div>
+</div>
+
+<!-- RESULTS SCREEN -->
+<div id="results" class="screen">
+<div style="text-align:center">
+<div class="result-circle" id="resCircle">
+<div class="result-pct" id="resPct"></div>
+<div class="result-label" id="resLabel"></div>
+</div>
+</div>
+<div class="result-details" id="resDetails"></div>
+<button class="btn btn-primary" onclick="showReview()">Review Answers</button>
+<button class="btn btn-secondary" onclick="goHome()">Back to Menu</button>
+</div>
+
+<!-- REVIEW SCREEN -->
+<div id="review" class="screen">
+<h2 style="margin-bottom:16px;color:#60a5fa">Review Answers</h2>
+<div id="reviewFilter" style="margin-bottom:12px">
+<div class="count-row">
+<div class="count-btn active" onclick="filterReview('all',this)">All</div>
+<div class="count-btn" onclick="filterReview('wrong',this)">Wrong</div>
+<div class="count-btn" onclick="filterReview('correct',this)">Correct</div>
+</div>
+</div>
+<div id="reviewList"></div>
+<button class="btn btn-secondary" style="margin-top:16px" onclick="show('results')">Back to Results</button>
+</div>
+
+<script>
+const ALL_Q = [
+{"n": 1, "q": "What does a Class D driver's license allow you to operate?", "a": "Any vehicle.", "b": "Any vehicle in Massachusetts.", "c": "Passenger vehicles, vans and small trucks.", "d": "Only passenger vehicles.", "ans": "C"},
+{"n": 2, "q": "What does it mean if your license is issued with a \"Corrective Lenses\" restriction?", "a": "You need only have your corrective lenses in the vehicle with you when you drive.", "b": "You need only wear your corrective lenses at night.", "c": "You need only to bring your corrective lenses the next time you have a driver's license vision test.", "d": "When you drive, you must wear the same type of corrective lenses that you used for the driver's license vision test.", "ans": "D"},
+{"n": 3, "q": "What does it mean if your license is issued with a Junior Operator restriction?", "a": "You must not be under 21 years of age to operate a motor vehicle.", "b": "You may not drive a motor vehicle between the hours of 12:00 a.m. and 5:00 a.m. unless accompanied by a parent or legal guardian.", "c": "You may not drive a motor vehicle at any time unless accompanied by a parent or legal guardian.", "d": "You may not drive a motor vehicle if an experienced driver could drive in your place.", "ans": "B"},
+{"n": 4, "q": "When are you required to carry a valid driver's license on your person or within easy reach inside your vehicle?", "a": "Whenever you operate a motor vehicle.", "b": "Only when you are operating another person's motor vehicle.", "c": "Only when traveling in heavy traffic.", "d": "Whenever it is convenient.", "ans": "A"},
+{"n": 5, "q": "How long is a person's first Massachusetts driver's license valid for?", "a": "10 years.", "b": "It will expire on their fifth birthday after date of issue.", "c": "3 years.", "d": "It will expire on their third birthday after date of issue.", "ans": "B"},
+{"n": 6, "q": "How long before your license expires may you renew it?", "a": "2 weeks.", "b": "2 months.", "c": "6 months.", "d": "1 year.", "ans": "D"},
+{"n": 7, "q": "When do you have to pass a vision screening test?", "a": "Only when trying to get your first license.", "b": "When trying to get your first license and each time you renew your license.", "c": "Only if your vision changes.", "d": "Every other time you renew your license.", "ans": "B"},
+{"n": 8, "q": "What does the law require you to do if you hold a Massachusetts learner's permit or driver's license and you change your address?", "a": "You do not need to notify the RMV.", "b": "Notify the RMV within 1 year of the change.", "c": "Notify the RMV within 30 days of the change.", "d": "You only need to inform the RMV if you are asked.", "ans": "C"},
+{"n": 9, "q": "What should you do if your directional signals or brake lights stop working properly?", "a": "You do not need to take any action.", "b": "Have them repaired immediately and in the meantime use the appropriate hand signals when turning or slowing down.", "c": "You only need to have them repaired if you live in the city.", "d": "You do not need to have them repaired as you can use the appropriate hand signals.", "ans": "B"},
+{"n": 10, "q": "Who is required to wear safety belts in Massachusetts?", "a": "No one is required to wear safety belts.", "b": "Every occupant of a private passenger motor vehicle.", "c": "Only those under 12 years of age.", "d": "Only those under 18 years of age.", "ans": "B"},
+{"n": 11, "q": "What is the possible penalty for a driver who operates a motor vehicle without wearing a safety belt?", "a": "There is no penalty.", "b": "A $25 fine.", "c": "A $15 fine.", "d": "A $5 fine.", "ans": "B"},
+{"n": 12, "q": "What is the possible penalty for a passenger 16 years of age or older who is not wearing a safety belt?", "a": "A $25 fine.", "b": "A $15 fine.", "c": "A $5 fine.", "d": "There is no penalty.", "ans": "A"},
+{"n": 13, "q": "What is the possible penalty for a driver who has passengers between the ages of 12 and 16 who are not wearing safety belts?", "a": "$5 per person.", "b": "$15 per person.", "c": "$25 per person.", "d": "There is no penalty.", "ans": "C"},
+{"n": 14, "q": "As passengers, children 12 years or younger are required to:", "a": "There are no requirements.", "b": "Wear a fitted child safety seat or seat belt if the driver is under 21 years.", "c": "Wear a fitted child safety seat or seat belt if the driver is over 21 years.", "d": "Wear a fitted child safety seat or seat belt at all times.", "ans": "D"},
+{"n": 15, "q": "What are the consequences for violating the law requiring child passengers to be properly restrained?", "a": "A $25 fine and it is a surchargeable event (for license suspension and insurance purposes).", "b": "A $15 fine and it is a surchargeable event (for license suspension and insurance purposes).", "c": "A $15 fine.", "d": "There is no penalty.", "ans": "A"},
+{"n": 16, "q": "For passengers age 5 years or younger, which form of restraint should be used?", "a": "They should be held by adults.", "b": "They shouldn't be retrained.", "c": "They should be securely fastened into an approved child passenger restraint.", "d": "It is up to the child to decide.", "ans": "C"},
+{"n": 17, "q": "Which statement is true about safety belts?", "a": "They will trap you inside the vehicle if you are in a crash.", "b": "They protect you from violently hitting the windshield, dashboard, steering wheel or other hard surfaces inside the vehicle.", "c": "They don't need to be worn if your vehicle is equipped with air bags.", "d": "They don't need to be worn while driving short distances.", "ans": "B"},
+{"n": 18, "q": "Which statement is true about safety belts?", "a": "They will trap you inside the vehicle if you are in a crash.", "b": "They don't need to be worn if your vehicle is equipped with air bags.", "c": "They keep you from being thrown out of the vehicle.", "d": "They don't need to be worn while driving short distances.", "ans": "C"},
+{"n": 19, "q": "Which statement is true about safety belts?", "a": "They don't need to be worn while driving short distances.", "b": "They will trap you inside the vehicle if you are in a crash.", "c": "They don't need to be worn if your vehicle is equipped with air bags.", "d": "If you're the driver, they help you stay in a seated position and maintain control of the vehicle, so you can avoid a more serious crash.", "ans": "D"},
+{"n": 20, "q": "Are you allowed to use a cellular telephone while driving?", "a": "No.", "b": "Yes, as long as you keep one hand on the steering wheel at all times.", "c": "Yes, but you must not take both hands off the wheel unless you are driving straight.", "d": "Yes, but you must occasionally keep your eyes on the road.", "ans": "B"},
+{"n": 21, "q": "Are you allowed to wear headphones while driving?", "a": "Yes.", "b": "If you keep the volume down.", "c": "No.", "d": "In rural areas.", "ans": "C"},
+{"n": 22, "q": "What is the best way to determine how fast to drive?", "a": "You should always drive as fast as the posted speed limit.", "b": "You must travel as fast as traffic allows you to.", "c": "You should drive as fast as your vehicle can go.", "d": "You must never travel faster than is reasonable and proper for the current conditions and public safety.", "ans": "D"},
+{"n": 23, "q": "When is it okay to drive faster than the posted speed limit?", "a": "When traffic is moving faster than the posted speed limit.", "b": "You must never drive faster than the posted speed limit.", "c": "When traffic flow is light.", "d": "It is usually okay to drive faster than the posted speed limit.", "ans": "B"},
+{"n": 24, "q": "What is the speed limit on roads near a school?", "a": "20 mph which may be posted in various ways.", "b": "35 mph which is seldom posted.", "c": "50 mph.", "d": "There is no speed limit on roads near a school.", "ans": "A"},
+{"n": 25, "q": "What must you do if you come across road construction or maintenance work and there are orange warning signs announcing a lower speed limit?", "a": "You must travel as fast as traffic allows you to.", "b": "You only need to obey these posted speed limits if you see work crews.", "c": "You must obey these posted speed limits.", "d": "You do not need to obey these posted speed limits.", "ans": "C"},
+{"n": 26, "q": "What does a steady red traffic light mean?", "a": "Slow down but not come to a complete stop.", "b": "Stop and wait until there are no other vehicles.", "c": "Stop only if other vehicles are present.", "d": "Stop and wait until the light is green. .", "ans": "D"},
+{"n": 27, "q": "Can you make a right turn on a steady red traffic light?", "a": "Never.", "b": "Only after coming to a complete stop, yielding to pedestrians and other vehicles in your path, and if there is not a sign indicating \"NO TURN ON RED\".", "c": "Only after coming to a complete stop with no need to yield to anyone.", "d": "Always.", "ans": "B"},
+{"n": 28, "q": "What does a flashing red traffic light mean?", "a": "Slow down but not come to a complete stop.", "b": "Stop only if other vehicles are present.", "c": "Stop and not to go until the light is green.", "d": "Come to a complete stop, obey the right-of-way laws and proceed when it is safe.", "ans": "D"},
+{"n": 29, "q": "What does a steady yellow traffic light mean?", "a": "That you should accelerate no matter what the conditions.", "b": "It is a warning that the traffic light is changing from green to red, you must stop if safe to do so.", "c": "That you should stop no matter what the conditions.", "d": "It is a warning that the traffic light is changing from red to green, you need to prepare to go.", "ans": "B"},
+{"n": 30, "q": "What does a steady green light mean?", "a": "Go, but only after yielding to other vehicles, bicycles, or pedestrians in the road.", "b": "To slow down before proceeding.", "c": "Go, regardless of other vehicles, bicycles, or pedestrians in the road.", "d": "To stop.", "ans": "A"},
+{"n": 31, "q": "What should you do if a traffic signal at an intersection is blacked-out and not functioning at all?", "a": "Continue through the intersection without stopping.", "b": "Do not enter the intersection.", "c": "Treat the intersection as having green lights.", "d": "Treat the intersection as having stop signs in all directions. Proceed when safe to do so.", "ans": "D"},
+{"n": 32, "q": "What color are stop signs?", "a": "Blue.", "b": "White.", "c": "Yellow.", "d": "Red.", "ans": "D"},
+{"n": 33, "q": "What does a double solid yellow line mean?", "a": "That traffic is only going one direction on that road.", "b": "That you may cross these lines to pass.", "c": "That you may never cross these lines.", "d": "You may not cross these lines unless turning left.", "ans": "D"},
+{"n": 34, "q": "When do you obey directions given to you by a traffic officer?", "a": "Only when that officer is with the state police.", "b": "Only when they don't conflict with any traffic signs, signals or pavement markings.", "c": "Even when they overrule any traffic signs, signals or pavement markings.", "d": "Only when there is heavy traffic.", "ans": "C"},
+{"n": 35, "q": "When may you use a highway breakdown lane as a travel lane?", "a": "During the hours of use that are clearly posted.", "b": "Whenever there is heavy traffic.", "c": "Whenever traffic has come to a stop.", "d": "Anytime.", "ans": "A"},
+{"n": 36, "q": "What is the rule about blocking an intersection with your vehicle?", "a": "It is legal if traffic has stopped.", "b": "It is illegal to block an intersection with your vehicle.", "c": "It is legal if the traffic light changes and you are still in the intersection.", "d": "It is legal whenever there is heavy traffic.", "ans": "B"},
+{"n": 37, "q": "When may you enter an intersection?", "a": "When there is enough room for you to safely drive through to the other side.", "b": "Whenever the traffic light is green.", "c": "Whenever you need to make a turn.", "d": "When traffic has stopped.", "ans": "A"},
+{"n": 38, "q": "When may you drive across a crosswalk?", "a": "When there is enough room for you to safely drive through to the other side.", "b": "Whenever the traffic light is green.", "c": "Whenever you need to make a turn.", "d": "When traffic has stopped.", "ans": "A"},
+{"n": 39, "q": "When making a right turn, you want to turn from which lane?", "a": "From the lane farthest to the left.", "b": "From the far right lane.", "c": "From whichever lane you choose.", "d": "You may not make a right turn.", "ans": "B"},
+{"n": 40, "q": "When making a left turn, you want to turn from which lane?", "a": "From the lane farthest to the left.", "b": "From the far right lane.", "c": "From whichever lane you choose.", "d": "You may not make a left turn.", "ans": "A"},
+{"n": 41, "q": "When may you turn left on a red traffic light?", "a": "At any time.", "b": "Anytime there are no other vehicles around.", "c": "Only if you use your turn signal first.", "d": "Only if you are turning from a one-way street onto another one-way street.", "ans": "D"},
+{"n": 42, "q": "When must you yield to pedestrians who are walking in or crossing a roadway?", "a": "When they are in a crosswalk.", "b": "When they are in an intersection.", "c": "You must always yield to these pedestrians.", "d": "You do not need to yield to pedestrians.", "ans": "C"},
+{"n": 43, "q": "Who has the right-of-way at a four-way stop that has stop signs in all directions?", "a": "A vehicle that has come to a full stop at the intersection first.", "b": "Vehicles that arrive to the four-way stop from a faster speed zone.", "c": "Any vehicle with passengers.", "d": "No one has the right-of-way at a four-way stop.", "ans": "A"},
+{"n": 44, "q": "Who has the right-of-way at a four-way stop that has stop signs in all directions?", "a": "No one has the right-of-way at a four-way stop.", "b": "Vehicles that arrive to the four-way stop from a faster speed zone.", "c": "Any vehicle with passengers.", "d": "A vehicle on the immediate right of another vehicle that has stopped at the intersection at the same time.", "ans": "D"},
+{"n": 45, "q": "Who has the right-of-way at an intersection where someone is making a left turn?", "a": "Vehicles behind the person making the left turn.", "b": "Any vehicle with passengers.", "c": "An oncoming vehicle.", "d": "No one has the right-of-way at an intersection.", "ans": "C"},
+{"n": 46, "q": "Who has the right-of-way at a rotary (traffic circle)?", "a": "Vehicles already in the rotary.", "b": "Vehicles behind the person approaching the rotary.", "c": "Any vehicle with passengers.", "d": "No one has the right-of-way when approaching a rotary.", "ans": "A"},
+{"n": 47, "q": "When may you use the shoulder of a road for passing?", "a": "Anytime.", "b": "Whenever there is heavy traffic.", "c": "Whenever traffic has come to a stop.", "d": "Never.", "ans": "D"},
+{"n": 48, "q": "When may you use a sidewalk for passing?", "a": "Anytime.", "b": "Whenever there is heavy traffic.", "c": "Whenever traffic has come to a stop.", "d": "Never.", "ans": "D"},
+{"n": 49, "q": "What must you do if you come upon a school bus or school pupil transport vehicle with lights flashing or a stop sign extended?", "a": "Unless you are traveling on a divided highway, you must stop no matter which side of the road you are traveling on.", "b": "You must stop if you are traveling on the right hand side of the road.", "c": "You must stop if you are traveling on the left hand side of the road.", "d": "You do not need to stop unless you see children.", "ans": "A"},
+{"n": 50, "q": "What must you do if you see or hear an emergency vehicle coming from any direction?", "a": "You must stop immediately no matter what the conditions.", "b": "Pull to the center of the road and stop until the vehicle has passed.", "c": "Pull as close as possible to the right side of the road and stop until the vehicle has passed.", "d": "You do not need to stop at any point.", "ans": "C"},
+{"n": 51, "q": "What must you do if you see or hear an emergency vehicle coming from any direction and you are in the middle of an intersection?", "a": "Stop in the middle of the intersection.", "b": "Continue driving through the intersection and pull over as soon as it is safe.", "c": "Pull to the center of the intersection and stop until the vehicle has passed.", "d": "You do not need to stop at any point.", "ans": "B"},
+{"n": 52, "q": "What are the blind spots (areas that the driver may not be able to see) of most trucks and large vehicles?", "a": "Behind the truck only.", "b": "Left and right of the truck only.", "c": "Right of the truck only.", "d": "Front, behind, left and right of the truck.", "ans": "D"},
+{"n": 53, "q": "When is it okay to pass a truck or bus on the right?", "a": "Only when it is absolutely necessary.", "b": "When a truck is in the left lane with its right turn signal on.", "c": "Anytime traffic is heavy.", "d": "Anytime.", "ans": "A"},
+{"n": 54, "q": "Are you allowed to throw lit cigarettes from a moving vehicle", "a": "No.", "b": "Yes, if it is near a rural area like a forest or field.", "c": "Yes, at anytime if you are over 18.", "d": "Yes.", "ans": "A"},
+{"n": 55, "q": "When is it okay to use your horn?", "a": "To express anger or complain about other drivers' mistakes.", "b": "To try to get a slow driver to move faster.", "c": "When necessary to avoid accidents.", "d": "In a traffic jam to try and get other vehicles moving.", "ans": "C"},
+{"n": 56, "q": "What should you NOT do when entering or exiting a highway?", "a": "Make sure you are in the proper lane well in advance to enter or exit the highway.", "b": "If you miss your exit, stop and backup on the highway.", "c": "Yield the right of way to drivers already on the highway.", "d": "As you approach and enter a highway travel lane, increase your speed to match that of vehicles already on the road.", "ans": "B"},
+{"n": 57, "q": "What should you NOT do when driving on the highway?", "a": "Stay to the right and only use the left lane for passing.", "b": "Weave in and out of traffic.", "c": "Drive in the middle of your lane, staying between the lines.", "d": "When changing lanes, use your rearview mirror and use your directional signals.", "ans": "B"},
+{"n": 58, "q": "When does the law require you to use your headlights?", "a": "One-half hour after sunset until one-half hour before sunrise.", "b": "3 hours after sunset until 3 hours before sunrise.", "c": "Only if other vehicles are present.", "d": "You are not required to use your headlights.", "ans": "A"},
+{"n": 59, "q": "To properly drive with high beam headlights you should lower them:", "a": "If you are within 50 feet of an oncoming vehicle; 20 feet of a vehicle in front of you.", "b": "If other drivers complain.", "c": "If you are within 500 feet of an oncoming vehicle; 200 feet of a vehicle in front of you.", "d": "High beams are o.k. anytime.", "ans": "C"},
+{"n": 60, "q": "What is a good driving tip for driving in rain?", "a": "Increase your speed to arrive at your destination sooner so that you may avoid the weather.", "b": "Decrease the space between you and other vehicles in order to prevent rain from hitting the highway.", "c": "Decrease your speed and increase the space between your vehicles and others.", "d": "You do not need to change your driving behavior in rain.", "ans": "C"},
+{"n": 61, "q": "What is a good driving tip for driving in snow?", "a": "Increase your speed to arrive at your destination sooner so that you may avoid the weather.", "b": "Decrease your speed and increase the space between your vehicles and others.", "c": "Decrease the space between you and other vehicles in order to prevent snow from hitting the highway.", "d": "You do not need to change your driving behavior in snow.", "ans": "B"},
+{"n": 62, "q": "What should you NOT do if your vehicle skids?", "a": "Ease off the gas and shift into neutral.", "b": "Hit the brakes.", "c": "Turn your steering wheel in the direction of the skid.", "d": "Be prepared to steer left and right a few times.", "ans": "B"},
+{"n": 63, "q": "What are you required to do if you are involved in an accident?", "a": "Make sure no one is hurt and then continue on your way.", "b": "Avoid showing your driver's license until you speak with an attorney.", "c": "File an accident report with both the RMV and the local police department if there has been $1000 or more of damage to property.", "d": "You are not required to do anything.", "ans": "C"},
+{"n": 64, "q": "Who is allowed the special privileges of a disabled plate or placard?", "a": "Any person using a vehicle displaying the plate or placard.", "b": "Any relative of the disabled person who has been granted the plate or placard.", "c": "Anyone who has a disabled plate or placard in his or her possession.", "d": "The disabled person who has been officially granted the plate or placard.", "ans": "D"},
+{"n": 65, "q": "When is a vehicle required to undergo a safety and emissions inspection in Massachusetts?", "a": "There are no such inspections in Massachusetts.", "b": "When the vehicle changes owners and then on a yearly basis.", "c": "Only when the vehicle changes owners.", "d": "Only once in the life of the vehicle.", "ans": "B"},
+{"n": 66, "q": "What vehicles are required to have insurance in Massachusetts?", "a": "No vehicles are required to have insurance.", "b": "Only passenger vehicles are required to have insurance.", "c": "Only commercial vehicles are required to have insurance.", "d": "All vehicles on the road are required to have insurance.", "ans": "D"},
+{"n": 67, "q": "Under the Safe Driver Insurance Plan (SDIP) what happens if you are a safe driver and keep your driving record clean?", "a": "Your premium may go down.", "b": "Your premium will go up.", "c": "There will be no change.", "d": "You will not need insurance.", "ans": "A"},
+{"n": 68, "q": "Under the Safe Driver Insurance Plan (SDIP) what happens if you are convicted of a criminal or civil motor vehicle violation, or if you are found to be at fault in an accident?", "a": "Your premium may go down.", "b": "Your premium will go up.", "c": "There will be no change.", "d": "You will not need insurance.", "ans": "B"},
+{"n": 69, "q": "The shape of a \"stop\" sign is?", "a": "Diamond.", "b": "Triangle.", "c": "Square.", "d": "Octagon (8 equal sides).", "ans": "D"},
+{"n": 70, "q": "The shape of a \"yield\" sign is?", "a": "Square.", "b": "Upside down triangle.", "c": "Octagon.", "d": "Diamond.", "ans": "B"},
+{"n": 71, "q": "What does a flashing yellow traffic light mean?", "a": "Slow down and come to a complete stop.", "b": "Stop and not to go until the light is green.", "c": "Proceed with caution and stay alert. Look both ways when crossing an intersection.", "d": "It is warning that the traffic light is changing from green to red.", "ans": "C"},
+{"n": 72, "q": "What should you do when you see a \"yield\" sign?", "a": "Slow down and be prepared to stop. Let traffic pass before proceeding.", "b": "Accelerate to prepare for any possible traffic.", "c": "Slow down and then force your way into traffic.", "d": "Come to a complete stop no matter what kind of traffic is visible.", "ans": "A"},
+{"n": 73, "q": "If you want to pass another car, how far ahead do you need to see before passing?", "a": "It doesn't really matter.", "b": "At least 25 feet.", "c": "At least 100 feet.", "d": "At least 400 feet.", "ans": "D"},
+{"n": 74, "q": "What is true about motor vehicle crashes in this country?", "a": "They seldom happen.", "b": "They result in very few deaths.", "c": "They result in very few deaths among children and young adults.", "d": "They are the leading cause of death among children and young adults.", "ans": "D"},
+{"n": 75, "q": "How many Americans will be injured at some time or killed in a motor vehicle crash?", "a": "One out of three.", "b": "One out of ten.", "c": "One out of twenty.", "d": "One out of fifty.", "ans": "A"},
+{"n": 76, "q": "What are speed limits based on?", "a": "A speed that is never safe to travel at.", "b": "A speed that is always safe to travel at.", "c": "Conditions when they are at their worst.", "d": "Ideal driving conditions.", "ans": "D"},
+{"n": 77, "q": "Unless posted otherwise, what would be considered a reasonable and proper speed when driving in a thickly settled or business district?", "a": "30 mph.", "b": "40 mph.", "c": "50 mph", "d": "55 mph.", "ans": "A"},
+{"n": 78, "q": "What must you do if you see any pedestrians entering or using a crosswalk in your path of travel?", "a": "Nothing if you have the right-of-way.", "b": "You must yield to the pedestrians.", "c": "Nothing if others are not yielding the right of way to the pedestrians.", "d": "You must yield if it is convenient.", "ans": "B"},
+{"n": 79, "q": "When may you let your vehicle block a crosswalk?", "a": "When the traffic flow traffic is heavy.", "b": "When you are stopped at a red light.", "c": "When the light is green and traffic is not moving.", "d": "Never.", "ans": "D"},
+{"n": 80, "q": "When you see a sign that uses a red circle with a diagonal slash what does that circle and slash mean?", "a": \"\"Okay to.\"\", "b": \"\"Sometimes permissible.\"\", "c": "These signs do not pertain to motorists.", "d": "Access or movement is prohibited, think \"No.\"", "ans": "D"},
+{"n": 81, "q": "The shape of a \"railroad crossing\" sign is?", "a": "Diamond.", "b": "Square.", "c": "Round.", "d": "Triangle.", "ans": "C"},
+{"n": 82, "q": "What must you do if a flag person or police officer is directing traffic around a work zone?", "a": "You must obey the flagger's or officer's signals.", "b": "You may obey the flagger's or officer's signals if it doesn't conflict with other rules of the road.", "c": "You may obey the flagger's or officer's signals if it is convenient.", "d": "You must obey the flagger's or officer's signals only if he or she is with the State Police.", "ans": "A"},
+{"n": 83, "q": "If the lights at a railroad crossing are flashing how far before the light post or gate must you stop?", "a": "200 feet.", "b": "15 feet.", "c": "3 feet.", "d": "You do not need to stop.", "ans": "B"},
+{"n": 84, "q": "When is it okay to drive around a lowered gate or ignore the flashing lights at a railroad crossing?", "a": "At any time.", "b": "Any time there is no train in sight.", "c": "Any time the train is stopped.", "d": "Never.", "ans": "D"},
+{"n": 85, "q": "When is it okay to tailgate another vehicle?", "a": "When they are driving too slow.", "b": "Never.", "c": "When traffic flow is heavy.", "d": "At any time.", "ans": "B"},
+{"n": 86, "q": "What is the main cause of rear-end crashes?", "a": "People driving too slow.", "b": "Heavy traffic flow.", "c": "Defective brake lights.", "d": "Tailgating.", "ans": "D"},
+{"n": 87, "q": "How far ahead should you signal your turn?", "a": "You are not required to signal a turn.", "b": "Whenever it is convenient.", "c": "100 feet before a turn. 500 feet before a turn on a highway.", "d": "15 feet before a turn.", "ans": "C"},
+{"n": 88, "q": "Why should you not pull in front of a truck or other large vehicleand slow down or stop suddenly?", "a": "There is no reason why you should not, you have the right-of-way.", "b": "There is no reason why you should not if the traffic flow is heavy.", "c": "You will not be able to slow down..", "d": "They may need twice the distance to stop than an automobile or motorcycle.", "ans": "D"},
+{"n": 89, "q": "Why should you not pull in front of a truck or other large vehicle and slow down or stop suddenly?", "a": "The driver might not have enough room to stop.", "b": "There is no reason why you should not, you have the right-of-way.", "c": "There is no reason why you should not if the traffic flow is heavy.", "d": "You will not be able to stop.", "ans": "A"},
+{"n": 90, "q": "Why should you stay with the flow of traffic when traveling in the second lane of a multiple-lane highway?", "a": "You should never stay with the flow of traffic.", "b": "That is the lane that is most often watched by law enforcement.", "c": "It is the fastest moving lane.", "d": "Trucks and buses use this lane as a passing lane.", "ans": "D"},
+{"n": 91, "q": "When are you required to use your turn signals?", "a": "When you change lanes.", "b": "Only when other cars are present.", "c": "Only when traffic flow is heavy.", "d": "You are not required to use traffic signals.", "ans": "A"},
+{"n": 92, "q": "When is it okay to make a U-turn?", "a": "When you are driving in the left lane, your path is clear and it is safe to do so.", "b": "When a \"NO U-TURN\" sign is posted.", "c": "At the crest of a hill or near a curve.", "d": "It is never okay to make a U-turn.", "ans": "A"},
+{"n": 93, "q": "What color are general warning signs?", "a": "Yellow.", "b": "Red.", "c": "Blue.", "d": "Green.", "ans": "A"},
+{"n": 94, "q": "What are \"right-of-way\" rules?", "a": "Rules that help drivers decide how to handle traffic situations that are not entirely determined by signs or signals.", "b": "There is no such thing as right-of-way.", "c": "Rules for use only by less experienced drivers.", "d": "Rules that are for pedestrians only.", "ans": "A"},
+{"n": 95, "q": "What is best to remember about \"right-of-way\"?", "a": "Right-of-way is something you take, not give.", "b": "Right-of-way is something you give, not take.", "c": "There is no such thing as right-of-way.", "d": "It is something to avoid.", "ans": "B"},
+{"n": 96, "q": "What should you do so that you will be able to hear an approaching siren of an emergency vehicle?", "a": "Lean in the seat of your vehicle towards a window.", "b": "Drive slowly.", "c": "Always drive with your windows down.", "d": "Avoid loud noise levels inside your vehicle.", "ans": "D"},
+{"n": 97, "q": "What should you look for if you hear a siren?", "a": "There is no real need to look for anything.", "b": "A fire.", "c": "One or more emergency vehicles. .", "d": "An accident.", "ans": "C"},
+{"n": 98, "q": "How do you know if you are tailgating a truck?", "a": "It is not possible to tailgate a truck.", "b": "By comparing yourself to other drivers around you.", "c": "There is no way to accurately tell.", "d": "If you can't see a truck's rearview mirrors.", "ans": "D"},
+{"n": 99, "q": "How do you know if you are following too closely behind another vehicle?", "a": "You can never follow too closely.", "b": "By comparing yourself to other drivers around you.", "c": "There is no way to accurately tell.", "d": "By using the \"two-second\" rule.", "ans": "D"},
+{"n": 100, "q": "What should you do if another driver is tailgating you?", "a": "Slam on your brakes.", "b": "Speed up as fast as you can.", "c": "Slowly brake until you stop.", "d": "Reduce your speed and allow the other driver to pass.", "ans": "D"},
+{"n": 101, "q": "What is driving considered in Massachusetts?", "a": "A right of every citizen.", "b": "An earned privilege.", "c": "A right of every citizen over 16 1/2 years of age.", "d": "A right of every citizen over 21 years of age.", "ans": "B"},
+{"n": 102, "q": "Who is responsible for a driver's actions once he/she has earned a driver's license?", "a": "No one is responsible for a driver's actions.", "b": "The RMV is responsible for a driver's actions.", "c": "The Commonwealth of Massachusetts is responsible for a driver's actions.", "d": "The driver is responsible for his/her actions.", "ans": "D"},
+{"n": 103, "q": "Which of the following violations can cause you to lose your driving privileges?", "a": "No violation can cause you to lose your driving privileges.", "b": "Criminal violations.", "c": "Civil motor vehicle infractions and criminal violations.", "d": "Civil motor vehicle infractions, criminal violations, motor vehicle accidents where you are found to be at fault.", "ans": "D"},
+{"n": 104, "q": "What does it mean when your driver's license is suspended or revoked?", "a": "Only some of your driving privileges are taken away.", "b": "Your driving privileges are taken away.", "c": "You may engage in restricted driving.", "d": "It is a warning, you may still continue to drive.", "ans": "B"},
+{"n": 105, "q": "What are the penalties for breaking a motor vehicle law?", "a": "A possible fine or loss of license or both.", "b": "Only a fine.", "c": "Only loss of license.", "d": "There are no penalties.", "ans": "A"},
+{"n": 106, "q": "If your license is suspended or revoked do you have a right to a hearing?", "a": "No.", "b": "Only if you are under 21 years of age.", "c": "Only if you have an attorney with you.", "d": "Yes.", "ans": "D"},
+{"n": 107, "q": "What may cause the penalties for numerous motor vehicle violations to be more severe?", "a": "Being under 21 years of age.", "b": "Being over 35 years of age.", "c": "Being over 45 years of age.", "d": "Penalties are always the same.", "ans": "A"},
+{"n": 108, "q": "What may cause the penalties for numerous motor vehicle violations to be more severe?", "a": "Being over 35 years of age.", "b": "Being over 45 years of age.", "c": "Being a repeat offender.", "d": "Penalties are always the same.", "ans": "C"},
+{"n": 109, "q": "If you receive a traffic citation from a law enforcement officer for a civil motor vehicle infraction (CMVI), how many days do you have to pay the required fine or request a hearing to dispute the citation?", "a": "10", "b": "20", "c": "30", "d": "90", "ans": "B"},
+{"n": 110, "q": "What happens if you do not respond to a traffic citation within the required time?", "a": "You will be charged a late fee and your license will be suspended.", "b": "You will just be issued a verbal warning.", "c": "You will just be issued a written warning.", "d": "Nothing will happen.", "ans": "A"},
+{"n": 111, "q": "Can continued failure to pay a traffic citation result in license suspension?", "a": "No.", "b": "No, unless it is a speeding citation.", "c": "Only if it is a citation over $250.", "d": "Yes.", "ans": "D"},
+{"n": 112, "q": "What does paying a motor vehicle citation mean?", "a": "It doesn't mean anything.", "b": "That you are willing to pay but will not accept responsibility for that violation.", "c": "That you accept responsibility for that violation.", "d": "That you do not accept responsibility for that violation.", "ans": "C"},
+{"n": 113, "q": "What moving violations are tracked in Massachusetts by the RMV and are recorded on your driving record?", "a": "All moving violations.", "b": "Only those involving speeding.", "c": "Only those committed in your own car.", "d": "No violations are tracked.", "ans": "A"},
+{"n": 114, "q": "What will happen if you do not pay your parking tickets ?", "a": "Nothing.", "b": "You will be prevented from renewing your driver's license or registration.", "c": "You will be prevented from renewing your registration if they exceed $1,000.", "d": "You will be prevented from renewing your driver's license if they exceed $5,000.", "ans": "B"},
+{"n": 115, "q": "What is the minimum penalty if you are given a citation for drivingover the speed limit?", "a": "$10 fine.", "b": "$25 fine.", "c": "$100 fine.", "d": "There is no minimum penalty.", "ans": "C"},
+{"n": 116, "q": "What happens if you are convicted of driving more than 10 miles-per-hour (mph) over the speed limit?", "a": "You will still receive the minimum speeding penalty.", "b": "You will be fined an additional $2 for each mile per-hour you were traveling over the first ten.", "c": "You will be fined an additional $10 for each mile per-hour you were traveling over the first ten.", "d": "You will be fined an additional $10 for each mile per-hour you were traveling over the first twenty.", "ans": "C"},
+{"n": 117, "q": "What are the maximum fines that speeding violations can carry?", "a": "Up to $50.", "b": "Up to $100.", "c": "Up to $200.", "d": "Up to $400.", "ans": "D"},
+{"n": 118, "q": "May your license be suspended due to a bad check to the RMV?", "a": "No.", "b": "Yes.", "c": "Only if the check is for an amount greater than $50.", "d": "Only if the check is for an amount greater than $100.", "ans": "B"},
+{"n": 119, "q": "Which of the following are criminal motor vehicle offenses?", "a": "Parking violations.", "b": "Non payment of excise taxes.", "c": "A speeding violation.", "d": "Driving with a suspended license, driving under the influence of alcohol, leaving the scene of an accident.", "ans": "D"},
+{"n": 120, "q": "What may happen to you for not responding truthfully and fully to a police officer who has requested you to provide your name and address?", "a": "No action may be taken by the officer.", "b": "You may be arrested.", "c": "No action may be taken by the officer if you are under 21.", "d": "No action may be taken by the officer if you are over 21.", "ans": "B"},
+{"n": 121, "q": "What may happen to you for not responding truthfully and fully to a police officer who has requested you to provide the vehicle owner's name and address?", "a": "You may be arrested.", "b": "No action may be taken by the officer.", "c": "No action may be taken by the officer if you are over 21.", "d": "No action may be taken by the officer if you are under 21.", "ans": "A"},
+{"n": 122, "q": "What may happen to you for not responding truthfully and fully to a police officer who has requested you to produce your driver's license on demand?", "a": "No action may be taken by the officer.", "b": "No action may be taken by the officer if you are over 21.", "c": "No action may be taken by the officer if you are under 21.", "d": "You may be arrested.", "ans": "D"},
+{"n": 123, "q": "What may happen to you for not responding truthfully and fully to a police officer who has requested you to show a valid registration certificate to the motor vehicle?", "a": "No action may be taken by the officer.", "b": "You may be arrested.", "c": "No action may be taken by the officer if you are under 21.", "d": "No action may be taken by the officer if you are over 21.", "ans": "B"},
+{"n": 124, "q": "What may happen to you for not responding truthfully and fully to a police officer who has requested you to sign your name in the officer's presence?", "a": "You may be arrested.", "b": "No action may be taken by the officer.", "c": "No action may be taken by the officer if you are under 21.", "d": "No action may be taken by the officer if you are over 21.", "ans": "A"},
+{"n": 125, "q": "What happens with traffic offenses you have committed in other states?", "a": "they cannot be placed on your driving record and will be ignored by the RMV.", "b": "they will be placed on your driving record but will not count toward license suspension in Massachusetts.", "c": "they will be placed on your driving record and treated by the RMV as if they had occurred in Massachusetts.", "d": "they are offenses which the RMV does not have access to.", "ans": "C"},
+{"n": 126, "q": "What happens if your license or driving privileges have been suspended or revoked in another state?", "a": "You are allowed less violations in Massachusetts before suspension.", "b": "Your Massachusetts license will only be valid in Massachusetts.", "c": "Your Massachusetts license will only be suspended if you are under 21 years of age.", "d": "Your Massachusetts license may be suspended or revoked.", "ans": "D"},
+{"n": 127, "q": "Which surchargeable events count toward possible license suspension?", "a": "Moving violations only.", "b": "Accident surcharges only.", "c": "Both moving violations and accident surcharges.", "d": "None of the above.", "ans": "C"},
+{"n": 128, "q": "How long will your driver's license be suspended for if you receive three speeding violations within a 12-month period?", "a": "30 days.", "b": "20 days.", "c": "10 days.", "d": "3 days.", "ans": "A"},
+{"n": 129, "q": "What will happen to your license if you accumulate (5) surchargeable events within 3 years?", "a": "Nothing.", "b": "It will be suspended unless you are under 21 years.", "c": "It will be suspended indefinitely.", "d": "It will be suspended indefinitely unless you complete a Driver Re-Training Program.", "ans": "D"},
+{"n": 130, "q": "What will happen if you accumulate seven (7) surchargeable events (such as a speeding violation) on your driving record within a three-year period?", "a": "Nothing will happen if all the events occurred in Massachusetts.", "b": "Your license will be suspended for 60 days.", "c": "Your license will be suspended for 30 days.", "d": "Your license will be suspended for 15 days.", "ans": "B"},
+{"n": 131, "q": "Is it possible to obtain a copy of your Massachusetts driving record?", "a": "Yes.", "b": "Only if you have an extensive driving record.", "c": "No.", "d": "No, unless your insurance company requests it.", "ans": "A"},
+{"n": 132, "q": "When does the Registrar of Motor Vehicles have the right to suspend or revoke your driver's license?", "a": "The Registrar does not have that right.", "b": "The Registrar does not have that right without a public hearing.", "c": "Only when the law requires it.", "d": "When the law requires it or when the Registrar considers you to be a threat to public safety.", "ans": "D"},
+{"n": 133, "q": "Does the Registrar have a right to suspend your license or your right to operate if you commit a serious motor vehicle offense and pose an immediate threat to public safety?", "a": "The Registrar does not have the right to take any action.", "b": "The Registrar cannot take any action without a hearing.", "c": "Yes", "d": "The Registrar may only suspend learner's permits.", "ans": "C"},
+{"n": 134, "q": "What does the Registrar have a right to do if it is determined at a hearing that you have operated a motor vehicle improperly?", "a": "Suspend your driving privileges if you are under 21 years of age.", "b": "Suspend your driving privileges", "c": "The Registrar does not have the right to take any action.", "d": "The Registrar does not have that right to take any action without a hearing.", "ans": "B"},
+{"n": 135, "q": "What is the length of suspension or revocation for operating a motor vehicle with a suspended or revoked license?", "a": "There is no suspension or revocation period for that offense.", "b": "10-15 days.", "c": "15-60 days.", "d": "60 days-1 year.", "ans": "D"},
+{"n": 136, "q": "What is the length of revocation for operating a motor vehicle without the authority of the owner?", "a": "1-3 years.", "b": "60 days-1 year.", "c": "15-60 days.", "d": "There is no revocation period for that offense.", "ans": "A"},
+{"n": 137, "q": "What is the driver's license revocation period for leaving the scene of an accident when a person is injured?", "a": "1-2 years.", "b": "60 days-1 year.", "c": "15-60 days.", "d": "There is no revocation period for that offense.", "ans": "A"},
+{"n": 138, "q": "What is the driver's license revocation period for leaving the scene of an accident involving property damage?", "a": "There is no revocation period for that offense.", "b": "10-15 days.", "c": "15-60 days.", "d": "60 days-1 year.", "ans": "D"},
+{"n": 139, "q": "What is the driver's license revocation period for operating to endanger?", "a": "60 days-1 year.", "b": "15-60 days.", "c": "10-15 days.", "d": "There is no revocation period for that offense.", "ans": "A"},
+{"n": 140, "q": "How long will your Massachusetts driver's license be suspended if your driving privileges have been suspended or revoked in another state?", "a": "15 days.", "b": "Until your out-of-state driving privileges have been reinstated.", "c": "60 days.", "d": "Your Massachusetts driver's license will not be suspended during this time.", "ans": "B"},
+{"n": 141, "q": "What does it mean if the RMV suspends or revokes your driver's license?", "a": "It is a warning, you may still continue to drive.", "b": "You may only drive in Massachusetts.", "c": "It means you have lost your driving privileges.", "d": "You may only drive your own car.", "ans": "C"},
+{"n": 142, "q": "What are you required to do if your license is suspended or revoked?", "a": "You are not required to do anything.", "b": "Leave your driver's license at the house when you drive.", "c": "Turn in your license immediately to the RMV.", "d": "Only turn in your driver's license if you are under 21 years of age.", "ans": "C"},
+{"n": 143, "q": "What happens if the RMV has suspended or revoked your license for any reason?", "a": "Only permitted to drive to work.", "b": "You are not permitted to drive.", "c": "Not permitted to drive with passengers.", "d": "Only permitted to drive your own car.", "ans": "B"},
+{"n": 144, "q": "What will happen if you are driving while your license is suspended or revoked?", "a": "Nothing will happen if you only drive in Massachusetts.", "b": "Nothing will happen if you are in your own car.", "c": "You may face a considerable fine and/or jail sentence.", "d": "You may face a fine only.", "ans": "C"},
+{"n": 145, "q": "Is a fee required to reinstate a suspended or revoked license?", "a": "No.", "b": "A fee is only required if you have misplace your suspended license.", "c": "There is no fee to reinstate a first time suspension.", "d": "Yes.", "ans": "D"},
+{"n": 146, "q": "If you owe a fee for a parking violation can you renew your driver's license?", "a": "Yes.", "b": "The RMV will only refuse to renew your license if you are in prison.", "c": "Only if unpaid fines for parking tickets total $1000 or more.", "d": "No.", "ans": "D"},
+{"n": 147, "q": "If you have any citations for abandoned vehicles can you renew your driver's license?", "a": "No.", "b": "Only if you have citations for more than two abandoned vehicles.", "c": "The RMV will only refuse to renew your license if you are in prison.", "d": "Yes.", "ans": "A"},
+{"n": 148, "q": "If you have any outstanding excise tax can you renew your driver's license?", "a": "Yes.", "b": "No.", "c": "The RMV will only refuse to renew your license if you are in prison.", "d": "Only if the balance on your outstanding excise tax is larger than $1000", "ans": "B"},
+{"n": 149, "q": "If you have any outstanding court warrants can you renew your driver's license?", "a": "Yes.", "b": "No.", "c": "The RMV will only refuse to renew your license if you are in prison.", "d": "Only if you have outstanding Superior Court warrants.", "ans": "B"},
+{"n": 150, "q": "If you have unpaid child support can you renew your driver's license?", "a": "Only if your unpaid child support balance is larger than $1000.", "b": "The RMV will only refuse to renew your license if you are in prison.", "c": "No.", "d": "Yes.", "ans": "C"},
+{"n": 151, "q": "What is true about alcohol, drugs and driving?", "a": "You have to be drunk or completely intoxicated to be a dangerous driver.", "b": "Only large amounts of alcohol or other drugs can decrease the mental and physical abilities you need to operate a motor vehicle safely.", "c": "You have to mix alcohol and drugs to be a dangerous driver.", "d": "Your driving can be greatly impaired by consuming or using small amounts of alcohol or drugs.", "ans": "D"},
+{"n": 152, "q": "In the U.S. each year, alcohol is responsible for what fraction of highway deaths?", "a": "1/2 of highway deaths.", "b": "1/3 of highway deaths.", "c": "1/4 of highway deaths.", "d": "1/8 of highway deaths.", "ans": "A"},
+{"n": 153, "q": "What side effects of alcohol use can have a negative impact on your driving abilities?", "a": "There are no side effects from alcohol use.", "b": "Alcohol slows down your reflexes, increases your reaction time, and distorts your vision and judgment.", "c": "There are side effects of alcohol use, but none that impact driving ability.", "d": "Alcohol sharpens your awareness and reaction.", "ans": "B"},
+{"n": 154, "q": "Can one alcoholic drink in an hour affect your driving?", "a": "Depends on the kind of alcoholic drink it is.", "b": "Yes.", "c": "Depends on the time of day.", "d": "No.", "ans": "B"},
+{"n": 155, "q": "Who is immune to the effects of drinking alcohol?", "a": "Heavier people.", "b": "People that drink alcohol often.", "c": "People that drink alcohol with meals.", "d": "No one.", "ans": "D"},
+{"n": 156, "q": "Is your ability to drive a vehicle safely impaired after drinking alcohol?", "a": "No.", "b": "Depends on the person.", "c": "Yes.", "d": "Depends on the vehicle.", "ans": "C"},
+{"n": 157, "q": "Which of the following will get alcohol out of your body?", "a": "Drinking black coffee.", "b": "Taking a cold shower.", "c": "Eating food.", "d": "Giving your body time to process the alcohol.", "ans": "D"},
+{"n": 158, "q": "What is the most \"ideal\" way to avoid operating a motor vehicle while under the influence of alcohol or drugs?", "a": "Only have one alcoholic beverage per hour.", "b": "If you have any alcoholic beverage, you should not drive.", "c": "Only drink alcohol with a meal.", "d": "After drinking alcohol wait an hour before driving.", "ans": "B"},
+{"n": 159, "q": "What is measured by blood alcohol content (BAC)?", "a": "The amount of unprocessed alcohol there is in your body.", "b": "The amount of alcohol in a drink.", "c": "The amount of blood in your body.", "d": "The amount of unprocessed alcohol there is in a drink.", "ans": "A"},
+{"n": 160, "q": "How is blood alcohol content (BAC) determined?", "a": "Either a blood or breath test.", "b": "A urine test.", "c": "Reading the labels on alcoholic beverages.", "d": "Either a written or coordination test.", "ans": "A"},
+{"n": 161, "q": "After you have been drinking, your blood alcohol content (BAC) depends on which of the following?", "a": "How often you consume alcohol.", "b": "How much you have had to drink.", "c": "How much you concentrate.", "d": "The town or city you are in.", "ans": "B"},
+{"n": 162, "q": "After you have been drinking, your blood alcohol content (BAC) depends on which of the following?", "a": "How much you concentrate.", "b": "The speed at which you are driving.", "c": "The type of vehicle you are driving.", "d": "The speed at which your own body processes alcohol.", "ans": "D"},
+{"n": 163, "q": "What is most important in determining your blood alcohol content (BAC)?", "a": "The kind of alcoholic beverage you drink.", "b": "The amount of alcohol you have consumed over a period of time.", "c": "What the alcohol is mixed with.", "d": "Where you consumed the alcoholic beverage.", "ans": "B"},
+{"n": 164, "q": "How much alcohol is contained in a 12-oz. beer or a 4-oz. glass of wine or a 1-oz. serving of 80-proof liquor?", "a": "Approximately 1/8 oz.", "b": "Approximately 1/4 oz.", "c": "Approximately 1/2 oz.", "d": "Approximately 1 oz.", "ans": "C"},
+{"n": 165, "q": "How much will an average person's blood alcohol content (BAC) increase after consuming a 12-oz. beer or a 4-oz. glass of wine or a 1-oz. serving of 80-proof liquor?", "a": ".0005.", "b": ".001.", "c": ".01.", "d": ".02.", "ans": "D"},
+{"n": 166, "q": "What are the required penalties for operating a motor vehicle under the influence of alcohol or drugs?", "a": "A fine and license suspension.", "b": "A fine.", "c": "License suspension.", "d": "There are no required penalties.", "ans": "A"},
+{"n": 167, "q": "What are the required penalties for more than one conviction of operating a motor vehicle under the influence of alcohol or drugs?", "a": "A fine.", "b": "A fine and license suspension.", "c": "A fine, a prison term, and license suspension.", "d": "There are no required penalties.", "ans": "C"},
+{"n": 168, "q": "What are the maximum penalties for the first conviction of operating a motor vehicle under the influence of alcohol or drugs?", "a": "$5000 fine, 2 1/2 year prison term, 1 year license suspension.", "b": "$100 fine, 90 day license suspension.", "c": "$250 fine, 6 month license suspension.", "d": "$500 to $1000 fine, maximum 1 year prison term, 6 month license suspension.", "ans": "A"},
+{"n": 169, "q": "If the court allows someone with their first operating under the influence (OUI) conviction to complete an Alcohol Education Course what happens to their license suspension period?", "a": "There is no change.", "b": "It is increased.", "c": "It is eliminated.", "d": "It is reduced.", "ans": "D"},
+{"n": 170, "q": "What does every licensed driver in the state agree to do according to the Massachusetts Implied Consent Law?", "a": "Drive sober and to consent to an alcohol test if requested by a law enforcement officer.", "b": "Drive carefully when drunk.", "c": "Consent to an alcohol test only if drinking hard alcohol.", "d": "Drive carefully when drunk and consent to an alcohol test only if drinking hard alcohol.", "ans": "A"},
+{"n": 171, "q": "What does a police officer have a right to do if he/she believes you are operating a motor vehicle under the influence of alcohol?", "a": "The officer does not have a right to do anything.", "b": "To perform a field sobriety test only.", "c": "To ask you to submit to a breath test only to calculate your blood alcohol content (BAC).", "d": "To ask you to submit to a field sobriety test and a breath or blood test to calculate your blood alcohol content (BAC).", "ans": "D"},
+{"n": 172, "q": "What is the blood alcohol content (BAC) legal limit for a driver in Massachusetts that is 21 years of age or older?", "a": ".1.", "b": ".08.", "c": ".06.", "d": ".04.", "ans": "B"},
+{"n": 173, "q": "What is the blood alcohol content (BAC) legal limit for a driver in Massachusetts that is under 21 years of age?", "a": ".02.", "b": ".04.", "c": ".06.", "d": ".08.", "ans": "A"},
+{"n": 174, "q": "What happens if you register an illegal blood alcohol content (BAC) or if you refuse a breath test?", "a": "No action is taken.", "b": "A warning is issued and you are allowed to continue to drive.", "c": "The police officer is required to take away your license immediately and the RMV will suspend your license.", "d": "The police officer may take away your license after a court hearing.", "ans": "C"},
+{"n": 175, "q": "Compared to other drivers, what is the likelihood that drivers under the age of 21 will be involved in a motor vehicle accident where alcohol is a factor?", "a": "Not as likely.", "b": "Twice as likely.", "c": "Half as likely.", "d": "The same likelihood.", "ans": "B"},
+{"n": 176, "q": "What is the penalty for a driver under 21 years of age that is found to have a blood alcohol content (BAC) of .02 or higher?", "a": "There is no penalty.", "b": "A possible 90 day license suspension, and requirement to attend a youth alcohol program.", "c": "A possible 60 day license suspension, and requirement to attend a youth alcohol program.", "d": "A possible 30 day license suspension, and requirement to attend a youth alcohol program.", "ans": "B"},
+{"n": 177, "q": "What is the penalty for a driver under 21 years of age who refuses a breath test?", "a": "There is no penalty.", "b": "A 60 day to 90 day license suspension, and requirement to attend a youth alcohol program.", "c": "A 90 day to 180 day license suspension, and requirement to attend a youth alcohol program.", "d": "A 180 day to 1 year license suspension, and requirement to attend a youth alcohol program.", "ans": "D"},
+{"n": 178, "q": "What is the required penalty if you are under 21 years of age and you purchase alcohol or have someone buy it for you?", "a": "A 90 day to 1 year license suspension.", "b": "A 60 day to 90 day license suspension.", "c": "A 30 day to 60 day license suspension.", "d": "There is no penalty.", "ans": "A"},
+{"n": 179, "q": "What is the required penalty if you are under 21 years of age and you possess, carry or transport alcohol unless accompanied by a parent or guardian?", "a": "There is no penalty.", "b": "A 30 day to 60 day license suspension.", "c": "A 60 day to 90 day license suspension.", "d": "A 90 day to 1 year license suspension.", "ans": "D"},
+{"n": 180, "q": "What is the penalty if convicted of falsifying your driver's license or presenting someone else's driver's license as if it were your own ID?", "a": "A 15 day license suspension.", "b": "You could spend up to 2 weeks in prison and face a 30 day license suspension.", "c": "You could  face a 1 year license suspension.", "d": "There is no penalty.", "ans": "C"},
+{"n": 181, "q": "When may you drink alcohol while driving?", "a": "When you are over 21 years of age.", "b": "Never.", "c": "When it is not hard alcohol.", "d": "When you are on rural highways.", "ans": "B"},
+{"n": 182, "q": "What happens if you refuse a breath test?", "a": "No action is taken.", "b": "A warning is issued and you are allowed to continue to drive.", "c": "The police officer is required to take away your license immediately and the RMV will suspend your license.", "d": "The police officer may take away your license after a court hearing.", "ans": "C"},
+{"n": 183, "q": "What is the penalty if you are convicted having an open alcoholic beverage inside your vehicle and you are 21 years of age or older?", "a": "A fine of $25 to $50.", "b": "A fine of $50 to $100.", "c": "A fine of $100 to $500.", "d": "There is no penalty.", "ans": "C"},
+{"n": 184, "q": "What is the penalty if you are convicted of having an open alcoholic beverage inside your vehicle and you are under 21 years of age?", "a": "You can be arrested, fined and have your license suspended.", "b": "You can only be fined.", "c": "You can only have your license suspended.", "d": "There is no penalty.", "ans": "A"},
+{"n": 185, "q": "Do Massachusetts laws that define violations and penalties for operating under the influence of alcohol apply to drugs as well?", "a": "Yes.", "b": "They only apply to illegal drugs.", "c": "They only apply to marijuana.", "d": "They don't apply to drugs.", "ans": "A"},
+{"n": 186, "q": "What kind of drugs can affect your driving skills?", "a": "Illegal drugs.", "b": "Prescription medicines.", "c": "Over-the-counter remedies.", "d": "Almost any drug can affect your driving skills.", "ans": "D"},
+{"n": 187, "q": "Can use of marijuana have a negative impact on your driving abilities?", "a": "Marijuana use has no negative impact on your driving abilities.", "b": "There are side effects of marijuana use, but none that impact driving ability.", "c": "Marijuana delays your responses to sights and sounds and weakens your ability to handle a quick series of tasks.", "d": "We just don't know enough about the side effects of marijuana use.", "ans": "C"},
+{"n": 188, "q": "Can use of marijuana have a negative impact on your driving abilities?", "a": "Marijuana use has no negative impact on your driving abilities.", "b": "Marijuana causes a severe loss of night vision.", "c": "There are side effects of marijuana use, but none that impact driving ability.", "d": "We just don't know enough about the side effects of marijuana use.", "ans": "B"},
+{"n": 189, "q": "Can you be considered operating under the influence (OUI) when taking prescription medication?", "a": "No.", "b": "Only if the medication is not prescribed by a doctor.", "c": "Only if you are under 21 years of age.", "d": "Yes.", "ans": "D"},
+{"n": 190, "q": "When is it illegal to operate a motor vehicle while impaired?", "a": "Only when alcohol is involved.", "b": "Only when illegal drugs are involved.", "c": "It is illegal to operate a motor vehicle while impaired by any substance.", "d": "Only when the driver is under 21 years of age.", "ans": "C"},
+{"n": 191, "q": "Can the use of illegal \"hard\" drugs like heroin or cocaine affect your driving?", "a": "No.", "b": "There are side effects, but none which could impair your driving.", "c": "We don't know enough about their impact.", "d": "They can make you unaware and indifferent to your surroundings.", "ans": "D"},
+{"n": 192, "q": "Can use of prescription sedatives and tranquilizers have a negative impact on your driving abilities?", "a": "Prescription can make you drowsy.", "b": "Prescription medication use has no negative impact on your driving abilities.", "c": "There are side effects of prescription medication use, but none that impact driving ability.", "d": "We just don't know enough about the side effects of prescription medication use.", "ans": "A"},
+{"n": 193, "q": "Can use of most medicines taken for colds, hay fever or headaches have a negative impact on your driving abilities?", "a": \"\"Everyday medicine\" use has no negative impact on your driving abilities.\", "b": \"\"Everyday medicine\" can cause drowsiness.\", "c": "There are side effects of \"everyday medicine\" use, but none that impact driving ability.", "d": "We just don't know enough about the side effects of \"everyday medicine\" use.", "ans": "B"},
+{"n": 194, "q": "Can use of stimulants such as pep pills, speed, cocaine and diet pills have a negative impact on your driving abilities?", "a": "Stimulant use has no negative impact on your driving abilities.", "b": "There are side effects of stimulant use, but none that impact driving ability.", "c": "Stimulants can inevitably cause fatigue, nervousness, dizziness and a lack of concentration and can also affect vision.", "d": "We just don't know enough about the side effects of stimulant use.", "ans": "C"},
+{"n": 195, "q": "Can use of inhalants such as solvents or glue vapors have a negative impact on your driving abilities?", "a": "Inhalant use has no negative impact on your driving abilities.", "b": "There are side effects of inhalant use, but none that impact driving ability.", "c": "We just don't know enough about the side effects of inhalant use.", "d": "Inhalants are not only a serious health hazard but can make you unable to operate a motor vehicle properly.", "ans": "D"},
+{"n": 196, "q": "The best way to determine side effects from prescription or over the counter drugs is to:", "a": "There should be no side effects.", "b": "Ask friends who use that medication.", "c": "Take the medication and experiment with driving to see the effect.", "d": "Read all labels and ask your doctor or pharmacist how they can effect you.", "ans": "D"},
+{"n": 197, "q": "What happens when you combine alcohol with drugs?", "a": "You dramatically increase the negative effects that either one would have on its own.", "b": "You cancel out the negative effects of each.", "c": "You sober up.", "d": "There are no effects of combining alcohol with drugs.", "ans": "A"},
+{"n": 198, "q": "Under what circumstances will your driver's license be suspended if you are convicted of a drug offense?", "a": "If you are convicted of a drug offense in Massachusetts only.", "b": "If you are convicted of any drug offense, whether it is in Massachusetts or another state.", "c": "If you are convicted of a drug offense in another state only.", "d": "Your license won't be suspended if you are convicted of a drug offense.", "ans": "B"},
+{"n": 199, "q": "Under what circumstances will your driver's license be suspended if you are convicted of a drug offense?", "a": "Only if a motor vehicle was involved in the offense.", "b": "Even if no motor vehicle was involved in the offense.", "c": "Only if you are under 21 years of age.", "d": "Your license won't be suspended if you are convicted of a drug offense.", "ans": "B"},
+{"n": 200, "q": "Massachusetts law requires you to lose your driving privileges for how long if you are convicted of a drug offense?", "a": "30 days to 90 days, depending on the conviction.", "b": "90 days to 180 days, depending on the conviction.", "c": "1 to 5 years, depending on the conviction.", "d": "A loss of license is not required.", "ans": "C"}
